@@ -174,7 +174,7 @@ body {
 .dashboard {
     flex: 1;
     display: grid;
-    grid-template-columns: 280px 1fr 400px;
+    grid-template-columns: 340px 1fr 400px;
     gap: 0.85rem;
     padding: 0.85rem;
     min-height: 0;

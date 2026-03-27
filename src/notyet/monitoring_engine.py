@@ -193,16 +193,10 @@ class MonitoringEngine:
         
         while self.running:
             try:
-                # If rotation failed, credentials are dead — skip misleading health checks
+                # If rotation failed, credentials are dead — stop the loop entirely
                 if self._rotation_failed:
-                    if self.event_logger:
-                        self.event_logger.log_event(
-                            "HEALTH_CHECK",
-                            "Skipped - credentials are invalid (rotation failed)",
-                            {"status": "dead"}
-                        )
-                    await asyncio.sleep(5)
-                    continue
+                    self.running = False
+                    break
 
                 # Perform S3 ListBuckets health check
                 success, error_code = self.s3.list_buckets()
@@ -638,29 +632,55 @@ class MonitoringEngine:
                 is_attached = self.policy_manager.verify_policy(identity)
 
                 if not is_attached:
-                    self._emit_defender_action(
-                        "Notyet policy has been detached/deleted/modified",
-                        {"policy_name": self.policy_manager.notyet_policy_name}
-                    )
+                    # Detect whether this is an SCP block vs policy tampering
+                    defender_msg = "Notyet policy has been detached/deleted/modified"
                     try:
                         self.policy_manager.restore_policy(identity)
+                        self._emit_defender_action(
+                            defender_msg,
+                            {"policy_name": self.policy_manager.notyet_policy_name}
+                        )
                         self._emit_attacker_response(
                             "Notyet policy restored",
                             {"policy_name": self.policy_manager.notyet_policy_name}
                         )
                         consecutive_failures = 0  # Reset failure counter
                     except Exception as restore_error:
+                        error_str = str(restore_error)
+                        # Detect SCP-based denial
+                        if "service control policy" in error_str.lower():
+                            defender_msg = "Service Control Policy (SCP) is blocking IAM operations"
+                        self._emit_defender_action(
+                            defender_msg,
+                            {"policy_name": self.policy_manager.notyet_policy_name}
+                        )
                         consecutive_failures += 1
                         if self.event_logger:
                             self.event_logger.log_event(
                                 "ERROR",
                                 f"Failed to restore notyet policy (attempt {consecutive_failures}/{max_consecutive_failures})",
-                                {"error": str(restore_error)}
+                                {"error": error_str}
                             )
                         else:
-                            self.logger.error(f"Failed to restore notyet policy: {str(restore_error)}")
+                            self.logger.error(f"Failed to restore notyet policy: {error_str}")
                 else:
                     consecutive_failures = 0  # Reset failure counter
+
+                # Enforce max consecutive failures — stop monitoring if unrecoverable
+                if consecutive_failures >= max_consecutive_failures:
+                    self.logger.error(
+                        f"Max consecutive failures reached ({max_consecutive_failures}). "
+                        f"Persistence is likely blocked by an SCP or credentials are fully invalid."
+                    )
+                    if self.event_logger:
+                        self.event_logger.log_event(
+                            "ERROR",
+                            f"Persistence lost — {max_consecutive_failures} consecutive failures. "
+                            f"Likely blocked by SCP or credentials fully revoked.",
+                            {"consecutive_failures": consecutive_failures}
+                        )
+                    self._rotation_failed = True
+                    break
 
                 # Wait 0.5 seconds before next check (reduced from 1s to improve detection speed)
                 await asyncio.sleep(0.5)
@@ -673,5 +693,8 @@ class MonitoringEngine:
                     f"Unexpected error in policy monitor loop: {str(e)} "
                     f"(consecutive failures: {consecutive_failures}/{max_consecutive_failures})"
                 )
+                if consecutive_failures >= max_consecutive_failures:
+                    self._rotation_failed = True
+                    break
                 # Continue running even if there's an error
                 await asyncio.sleep(0.5)

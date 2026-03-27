@@ -65,7 +65,7 @@ class ControlPanel extends HTMLElement {
                     </div>
                 </div>
 
-                <div class="btn-row" style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border-default);">
+                <div class="btn-row">
                     <button type="submit" id="start-btn" class="btn btn-start">Start</button>
                     <button type="button" id="stop-btn" class="btn btn-stop" disabled>Stop</button>
                     <button type="button" id="restart-btn" class="btn btn-restart" disabled>Restart</button>

@@ -250,24 +250,32 @@ class PolicyManager:
         """
         Check if a policy document matches the expected AdministratorAccess policy.
 
+        Validates that the statement has exactly the expected fields (Effect, Action,
+        Resource) with no extra keys like Condition that could short-circuit the allow.
+
         Args:
             policy_doc: The policy document dict to check
 
         Returns:
-            bool: True if the policy grants Allow on all actions and resources
+            bool: True if the policy is an unconditional Allow on all actions and resources
         """
         statements = policy_doc.get('Statement', [])
-        if not statements:
+        if len(statements) != 1:
             return False
 
-        for stmt in statements:
-            effect = stmt.get('Effect', '')
-            action = stmt.get('Action', '')
-            resource = stmt.get('Resource', '')
-            if effect == 'Allow' and action == '*' and resource == '*':
-                return True
+        stmt = statements[0]
+        expected_keys = {'Effect', 'Action', 'Resource'}
+        # Allow Sid as it's informational and doesn't affect evaluation
+        stmt_keys = {k for k in stmt.keys() if k != 'Sid'}
 
-        return False
+        if stmt_keys != expected_keys:
+            return False
+
+        return (
+            stmt.get('Effect') == 'Allow'
+            and stmt.get('Action') == '*'
+            and stmt.get('Resource') == '*'
+        )
 
     def _remove_other_inline_policies(self, identity: CallerIdentity) -> None:
         """

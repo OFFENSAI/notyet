@@ -22,9 +22,9 @@
     --accent-yellow: #ffb300;
     --accent-purple: #b388ff;
 
-    --text-primary: #eaedf3;
-    --text-secondary: #8b92a8;
-    --text-muted: #4a5068;
+    --text-primary: #f0f2f7;
+    --text-secondary: #a8b0c4;
+    --text-muted: #636b82;
 
     --border-default: rgba(255, 255, 255, 0.06);
     --border-hover: rgba(0, 212, 255, 0.25);
@@ -49,21 +49,23 @@
 /* ===== Buttons ===== */
 
 .btn {
-    padding: 0.6rem 1.15rem;
-    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    padding: 0 0.75rem;
     border: 1px solid var(--border-default);
     border-radius: var(--radius-sm);
     font-family: var(--font-ui);
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
     cursor: pointer;
     transition: all var(--transition-fast);
     background: var(--bg-secondary);
     color: var(--text-primary);
-    position: relative;
-    overflow: hidden;
 }
 
 .btn:hover:not(:disabled) {
@@ -261,9 +263,9 @@
     letter-spacing: 0.03em;
 }
 
-.status-label-gray { color: var(--text-muted); }
-.status-label-green { color: var(--accent-green); }
-.status-label-red { color: var(--accent-red); }
+.status-label-gray { color: var(--text-secondary); }
+.status-label-green { color: #5fffaa; }
+.status-label-red { color: #ff6b8a; }
 
 /* ===== Count Badges ===== */
 
@@ -282,15 +284,15 @@
 }
 
 .count-badge-red {
-    background: rgba(255, 45, 85, 0.12);
-    color: var(--accent-red);
-    border: 1px solid rgba(255, 45, 85, 0.3);
+    background: rgba(255, 107, 138, 0.15);
+    color: #ff6b8a;
+    border: 1px solid rgba(255, 107, 138, 0.35);
 }
 
 .count-badge-green {
-    background: rgba(0, 230, 118, 0.12);
-    color: var(--accent-green);
-    border: 1px solid rgba(0, 230, 118, 0.3);
+    background: rgba(95, 255, 170, 0.15);
+    color: #5fffaa;
+    border: 1px solid rgba(95, 255, 170, 0.35);
 }
 
 /* ===== Filter Buttons ===== */
@@ -362,7 +364,7 @@
 }
 
 .log-timestamp {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     white-space: nowrap;
     flex-shrink: 0;
     font-family: var(--font-mono);
@@ -377,11 +379,11 @@
     font-size: 0.72rem;
 }
 
-.log-type-cyan { color: var(--accent-cyan); }
-.log-type-red { color: var(--accent-red); }
-.log-type-green { color: var(--accent-green); }
-.log-type-yellow { color: var(--accent-yellow); }
-.log-type-muted { color: var(--text-muted); }
+.log-type-cyan { color: #4dd8ff; }
+.log-type-red { color: #ff6b8a; }
+.log-type-green { color: #5fffaa; }
+.log-type-yellow { color: #ffd54f; }
+.log-type-muted { color: var(--text-secondary); }
 
 .log-text {
     color: var(--text-primary);
@@ -435,8 +437,8 @@
 
 .event-card-time {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--text-muted);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
     margin-bottom: 0.3rem;
 }
 
@@ -447,13 +449,13 @@
     margin-bottom: 0.2rem;
 }
 
-.event-card-action-red { color: var(--accent-red); }
-.event-card-action-green { color: var(--accent-green); }
+.event-card-action-red { color: #ff6b8a; }
+.event-card-action-green { color: #5fffaa; }
 
 .event-card-details {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--text-secondary);
+    font-size: 0.74rem;
+    color: #c0c8dc;
     word-break: break-word;
     line-height: 1.5;
 }
@@ -464,7 +466,7 @@
     font-family: var(--font-ui);
     font-size: 0.72rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: #9aa2b8;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 0.4rem;
@@ -475,11 +477,12 @@
 .empty-state {
     padding: 2rem 1.5rem;
     text-align: center;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-family: var(--font-ui);
     font-size: 0.85rem;
     font-style: normal;
     line-height: 1.6;
+    opacity: 0.7;
 }
 
 /* ===== Search highlight ===== */
@@ -497,8 +500,11 @@ mark.search-match {
 .btn-row {
     display: flex;
     gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .btn-row .btn {
-    flex: 1;
+    flex: 1 1 0%;
 }
