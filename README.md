@@ -33,6 +33,8 @@ When running, notyet monitors the compromised identity and reacts to defender ac
 - **notyet policy modified or deleted** -- Validates policy content (not just name) and restores it if tampered with.
 - **User added to group with deny** -- Detects group membership changes and removes the membership.
 
+Checkout a comprehensive test against the tool's techniques done by Nigel Sood from Sonrai Security: https://sonraisecurity.com/blog/fighting-eventual-consistency-based-persistence-an-analysis-of-notyet/
+
 ### Persistence matrix
 
 | Defender Action | Access Key (AKIA) | Role Session (ASIA) |
